@@ -4,24 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Available AWS Services</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin: 0 auto;
+            width: 300px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
     <h1>Available AWS Services</h1>
-    <ul>
-        {% for service in services %}
-            <li>{{ service }}</li>
-        {% endfor %}
-    </ul>
-    <form action="{{ url_for('delete_service') }}" method="post">
+
+    <form action="{{ url_for('list_services') }}" method="get">
+        <input type="hidden" name="access_key" value="{{ access_key }}">
+        <input type="hidden" name="secret_key" value="{{ secret_key }}">
+        <input type="hidden" name="region" value="{{ region }}">
         <label for="service">Select a service:</label>
         <select id="service" name="service">
-            {% for service in services %}
-                <option value="{{ service }}">{{ service }}</option>
-            {% endfor %}
+            <option value="">-- Select a service --</option>
+            <option value="iot_topic_rules">IoT Topic Rules</option>
+            <option value="dynamodb">DynamoDB Tables</option>
+            <option value="iot_policies">IoT Policies</option>
         </select><br><br>
-        <label for="id">Enter service ID:</label>
-        <input type="text" id="id" name="id"><br><br>
-        <input type="submit" value="Delete">
+        <input type="submit" value="List Resources">
     </form>
+
+    {% if resources %}
+        <h2>Resources for {{ selected_service }} in {{ region }}</h2>
+        <ul>
+            {% for resource in resources %}
+                <li>
+                    {{ resource }}
+                    <form action="{{ url_for('delete_resource') }}" method="post">
+                        <input type="hidden" name="access_key" value="{{ access_key }}">
+                        <input type="hidden" name="secret_key" value="{{ secret_key }}">
+                        <input type="hidden" name="region" value="{{ region }}">
+                        <input type="hidden" name="selected_service" value="{{ selected_service }}">
+                        <input type="hidden" name="resource_name" value="{{ resource }}">
+                        <button type="submit" name="action" value="delete">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
 </body>
 </html>
